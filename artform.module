@@ -1,0 +1,74 @@
+<?php
+require_once('form_mangle_user_input.inc');
+
+/**
+ * Implements hook_menu().
+ */
+function artform_menu() {
+  $items['artform/1'] = array(
+    'title' => 'Test changing user input',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('artform_form_1'),
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+function artform_form_1($form, &$form_state) {
+  drupal_set_message("form build t1: " . 
+    (isset($form_state['values']['t1'])
+    ? check_plain($form_state['values']['t1'])
+    : 'UNSET')
+  );
+  $form['t1'] = [
+    '#type' => 'textfield',
+    '#title' => 'Text 1',
+    '#desription' => 'All letter "a"s will be removed.',
+    '#element_validate' => ['artform_elval_1', 'artform_elval_2'],
+    ];
+  $form['reb'] = [
+    '#type' => 'submit',
+    '#value' => 'Submit but force rebuild',
+  ];
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  ];
+
+  return $form;
+}
+
+function artform_form_1_validate($form, &$form_state) {
+  drupal_set_message("form validation. t1 value: " . 
+    (isset($form_state['values']['t1'])
+    ? check_plain($form_state['values']['t1'])
+    : 'UNSET')
+  );
+}
+
+function artform_form_1_submit($form, &$form_state) {
+  $x=1;
+  drupal_set_message("form submit. t1 value: " . 
+    (isset($form_state['values']['t1'])
+    ? check_plain($form_state['values']['t1'])
+    : 'UNSET')
+  );
+  if ($form_state['triggering_element']['#value'] == 'Submit but force rebuild') {
+    drupal_set_message('rebuild triggered');
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    drupal_set_message('end of submit');
+    $form_state['redirect'] = FALSE;
+  }
+}
+
+function artform_elval_1($element, &$form_state, $form) {
+  drupal_set_message('elval_1: element #value:' . check_plain($element['#value']));
+  $new = strtr($element['#value'], ['a' => '']);
+  form_mangle_user_input($element, $new, $form_state);
+}
+function artform_elval_2($element, &$form_state, $form) {
+  drupal_set_message('elval_2: element #value:' . check_plain($element['#value']));
+}

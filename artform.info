@@ -1,0 +1,5 @@
+name = Artform
+description = Testing Form API
+version = 7.x
+core = 7.x
+files[] = artfrom.module
