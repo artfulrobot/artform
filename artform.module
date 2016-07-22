@@ -16,9 +16,10 @@ function artform_menu() {
 }
 
 function artform_form_1($form, &$form_state) {
-  drupal_set_message("form build t1: " . 
-    (isset($form_state['values']['t1'])
-    ? check_plain($form_state['values']['t1'])
+
+  drupal_set_message("form submit. form_state.values: " .
+    (isset($form_state['values'])
+    ? check_plain(json_encode($form_state['values']))
     : 'UNSET')
   );
   $form['t1'] = [
@@ -26,6 +27,19 @@ function artform_form_1($form, &$form_state) {
     '#title' => 'Text 1',
     '#desription' => 'All letter "a"s will be removed.',
     '#element_validate' => ['artform_elval_1', 'artform_elval_2'],
+    ];
+  $form['a'] = [
+    '#type' => 'fieldset',
+    '#legend' => 'Nest test',
+    '#tree' => TRUE,
+      't2' => [
+        [
+        '#type' => 'textfield',
+        '#title' => 'Text 2',
+        '#desription' => 'All letter "a"s will be removed.',
+        '#element_validate' => ['artform_elval_1', 'artform_elval_2'],
+        ],
+      ],
     ];
   $form['reb'] = [
     '#type' => 'submit',
@@ -40,20 +54,14 @@ function artform_form_1($form, &$form_state) {
 }
 
 function artform_form_1_validate($form, &$form_state) {
-  drupal_set_message("form validation. t1 value: " . 
-    (isset($form_state['values']['t1'])
-    ? check_plain($form_state['values']['t1'])
-    : 'UNSET')
-  );
+  drupal_set_message("form validation. form_state.values: " . 
+    check_plain(json_encode($form_state['values'])));
 }
 
 function artform_form_1_submit($form, &$form_state) {
-  $x=1;
-  drupal_set_message("form submit. t1 value: " . 
-    (isset($form_state['values']['t1'])
-    ? check_plain($form_state['values']['t1'])
-    : 'UNSET')
-  );
+  drupal_set_message("form submit. form_state.values: " .
+    check_plain(json_encode($form_state['values'])));
+
   if ($form_state['triggering_element']['#value'] == 'Submit but force rebuild') {
     drupal_set_message('rebuild triggered');
     $form_state['rebuild'] = TRUE;
@@ -65,10 +73,10 @@ function artform_form_1_submit($form, &$form_state) {
 }
 
 function artform_elval_1($element, &$form_state, $form) {
-  drupal_set_message('elval_1: element #value:' . check_plain($element['#value']));
+  drupal_set_message('elval_1: ' . implode('/', $element['#parents']) . ' element #value:' . check_plain($element['#value']));
   $new = strtr($element['#value'], ['a' => '']);
   form_mangle_user_input($element, $new, $form_state);
 }
 function artform_elval_2($element, &$form_state, $form) {
-  drupal_set_message('elval_2: element #value:' . check_plain($element['#value']));
+  drupal_set_message('elval_2: ' . implode('/', $element['#parents']) . ' element #value:' . check_plain($element['#value']));
 }
