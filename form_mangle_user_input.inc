@@ -16,7 +16,7 @@ if (!function_exists('form_mangle_user_input')) {
    * @param mixed $value. The value you want to change it to.
    * @param &Array $form_state.
    */
-  function form_mangle_user_input($element, $value, &$form_state) {
+  function form_mangle_user_input(&$element, $value, &$form_state) {
 
     /**
      * Follow parents down array, then set value.
@@ -43,6 +43,10 @@ if (!function_exists('form_mangle_user_input')) {
         $ptr = $value;
       }
     };
+
+    // Correct the $element's value. This is trivial but enables code below the
+    // call to this function to work with $element['#value'] as normal.
+    $element['#value'] = $value;
 
     // This sets it in form_state values. Drupal has its own version of this,
     // but we use ours for consistnecy within this function. Equivalent to
